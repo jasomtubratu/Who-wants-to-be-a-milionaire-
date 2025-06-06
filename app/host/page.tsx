@@ -61,7 +61,7 @@ export default function HostPage() {
   const handleRevealQuestion = () => {
     getSocket().emit('revealQuestion', gameStore.currentQuestionIndex);
     gameStore.revealQuestion();
-    audioManager.playQuestionReveal(gameStore.currentQuestionIndex);
+    // Audio will play on presentation view, not here
   };
 
   const handleRevealAnswers = () => {
@@ -72,19 +72,15 @@ export default function HostPage() {
   const handleSelectAnswer = (index: number) => {
     getSocket().emit('selectAnswer', index);
     gameStore.selectAnswer(index);
-    audioManager.playFinalAnswer();
+    // Audio will play on presentation view, not here
   };
 
   const handleRevealCorrectAnswer = () => {
     const isCorrect = gameStore.selectedAnswer === correctAnswerIndex;
-    getSocket().emit('revealCorrectAnswer', { isCorrect });
+    const isFinalQuestion = gameStore.currentQuestionIndex === questions.length - 1;
+    getSocket().emit('revealCorrectAnswer', { isCorrect, isFinalQuestion });
     gameStore.revealCorrectAnswer();
-    
-    if (isCorrect) {
-      audioManager.playCorrectAnswer();
-    } else {
-      audioManager.playIncorrectAnswer();
-    }
+    // Audio will play on presentation view, not here
   };
 
   const handleNextQuestion = () => {
@@ -152,6 +148,8 @@ export default function HostPage() {
   const toggleAudio = () => {
     const newState = !audioManager.isAudioEnabled();
     audioManager.setEnabled(newState);
+    // Broadcast audio setting to presentation view
+    getSocket().emit('audioToggle', { enabled: newState });
   };
 
   const getTotalVotes = () => {

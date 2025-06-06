@@ -41,11 +41,11 @@ export default function PresentationPage() {
       audioManager.playFinalAnswer();
     });
 
-    socket.on('correctAnswerRevealed', (data: { isCorrect: boolean }) => {
+    socket.on('correctAnswerRevealed', (data: { isCorrect: boolean; isFinalQuestion?: boolean }) => {
       gameStore.revealCorrectAnswer();
       
       if (data.isCorrect) {
-        audioManager.playCorrectAnswer();
+        audioManager.playCorrectAnswer(data.isFinalQuestion || false);
       } else {
         audioManager.playIncorrectAnswer();
       }
@@ -97,6 +97,10 @@ export default function PresentationPage() {
       gameStore.addVote(data.answer);
     });
 
+    socket.on('audioToggle', (data: { enabled: boolean }) => {
+      audioManager.setEnabled(data.enabled);
+    });
+
     return () => {
       socket.off('introShown');
       socket.off('questionRevealed');
@@ -111,12 +115,14 @@ export default function PresentationPage() {
       socket.off('phoneCallEnded');
       socket.off('votingEnded');
       socket.off('voteReceived');
+      socket.off('audioToggle');
     };
   }, []);
 
   const currentQuestion = questions[gameStore.currentQuestionIndex];
 
   const handleGoHome = () => {
+    audioManager.stopAll();
     router.push('/');
   };
 
@@ -199,21 +205,21 @@ export default function PresentationPage() {
       </div>
 
       <VideoModal
-        src="/assets/intro.mp4"
+        src="/intro.mp4"
         isOpen={gameStore.showIntro}
         onClose={() => gameStore.setShowIntro(false)}
         autoClose={true}
       />
 
       <VideoModal
-        src="/assets/calling-480p.mp4"
+        src="/calling-480p.mp4"
         isOpen={gameStore.showCalling}
         onClose={() => gameStore.setShowCalling(false)}
         loop={true}
       />
 
       <VideoModal
-        src="/assets/countdown.mp4"
+        src="/countdown.mp4"
         isOpen={gameStore.showCountdown}
         onClose={() => gameStore.setShowCountdown(false)}
         autoClose={true}

@@ -68,6 +68,10 @@ const SocketHandler = (req: any, res: any) => {
       socket.broadcast.emit('votingEnded', data);
     });
 
+    socket.on('audioToggle', (data) => {
+      socket.broadcast.emit('audioToggle', data);
+    });
+
     socket.on('disconnect', () => {
       console.log('Client disconnected');
     });

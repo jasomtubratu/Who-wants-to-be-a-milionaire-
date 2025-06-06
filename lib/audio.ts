@@ -3,6 +3,7 @@
 class AudioManager {
   private audioCache: Map<string, HTMLAudioElement> = new Map();
   private isEnabled: boolean = true;
+  private currentAudio: HTMLAudioElement | null = null;
 
   constructor() {
     // Preload audio files
@@ -16,7 +17,8 @@ class AudioManager {
       'finalanswer.mp3',
       'question[1-5].mp3',
       'question[5-10].mp3',
-      'question[10-15].mp3'
+      'question[10-15].mp3',
+      'correct-millionare.mp3'
     ];
 
     audioFiles.forEach(file => {
@@ -36,8 +38,17 @@ class AudioManager {
     }
   }
 
-  public playCorrectAnswer() {
-    this.playAudio('correct.mp3');
+  private stopCurrentAudio() {
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+      this.currentAudio = null;
+    }
+  }
+
+  public playCorrectAnswer(isFinalQuestion: boolean = false) {
+    const audioFile = isFinalQuestion ? 'correct-millionare.mp3' : 'correct.mp3';
+    this.playAudio(audioFile);
   }
 
   public playIncorrectAnswer() {
@@ -57,18 +68,31 @@ class AudioManager {
     if (!this.isEnabled) return;
 
     try {
+      // Stop any currently playing audio
+      this.stopCurrentAudio();
+
       let audio = this.audioCache.get(filename);
       
       if (!audio) {
-        audio = new Audio(`/assets/${filename}`);
+        audio = new Audio(`/${filename}`);
         this.audioCache.set(filename, audio);
       }
 
       // Reset audio to beginning and play
       audio.currentTime = 0;
+      this.currentAudio = audio;
+      
       audio.play().catch(error => {
         console.warn('Audio playback failed:', error);
+        this.currentAudio = null;
       });
+
+      // Clear current audio reference when it ends
+      audio.onended = () => {
+        if (this.currentAudio === audio) {
+          this.currentAudio = null;
+        }
+      };
     } catch (error) {
       console.warn('Audio error:', error);
     }
@@ -76,10 +100,17 @@ class AudioManager {
 
   public setEnabled(enabled: boolean) {
     this.isEnabled = enabled;
+    if (!enabled) {
+      this.stopCurrentAudio();
+    }
   }
 
   public isAudioEnabled(): boolean {
     return this.isEnabled;
+  }
+
+  public stopAll() {
+    this.stopCurrentAudio();
   }
 }
 
