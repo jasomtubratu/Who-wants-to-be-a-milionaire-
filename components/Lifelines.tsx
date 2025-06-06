@@ -21,6 +21,9 @@ interface LifelineProps {
   activeLifeline: string | null;
   disabled?: boolean;
   isPresentation?: boolean;
+  audienceVotes?: { [key: string]: number };
+  getTotalVotes?: () => number;
+  getVotePercentage?: (letter: string) => number;
 }
 
 export default function Lifelines({
@@ -30,33 +33,43 @@ export default function Lifelines({
   onUseAskAudience,
   activeLifeline,
   disabled = false,
-  isPresentation = false
+  isPresentation = false,
+  audienceVotes = {},
+  getTotalVotes = () => 0,
+  getVotePercentage = () => 0
 }: LifelineProps) {
-  const [audienceVotes, setAudienceVotes] = useState<number[]>([]);
+  const [audienceVotesDisplay, setAudienceVotesDisplay] = useState<number[]>([]);
   
   useEffect(() => {
-    if (activeLifeline === "audience") {
-      // Generate random audience votes, with higher probability for correct answer
-      const votes = [
-        Math.floor(Math.random() * 20) + 10,  // A: 10-30%
-        Math.floor(Math.random() * 20) + 40,  // B: 40-60% (typically correct)
-        Math.floor(Math.random() * 20) + 5,   // C: 5-25%
-        Math.floor(Math.random() * 15) + 5    // D: 5-20%
-      ];
-      
-      // Normalize to 100%
-      const total = votes.reduce((sum, v) => sum + v, 0);
-      const normalized = votes.map(v => Math.round((v / total) * 100));
-      
-      // Adjust to make sure it's exactly 100%
-      const diff = 100 - normalized.reduce((sum, v) => sum + v, 0);
-      normalized[0] += diff;
-      
-      setAudienceVotes(normalized);
+    if (activeLifeline === "audience" && isPresentation) {
+      // Use real votes if available, otherwise generate random ones
+      const totalVotes = getTotalVotes();
+      if (totalVotes > 0) {
+        const votes = ['A', 'B', 'C', 'D'].map(letter => getVotePercentage(letter));
+        setAudienceVotesDisplay(votes);
+      } else {
+        // Generate random audience votes, with higher probability for correct answer
+        const votes = [
+          Math.floor(Math.random() * 20) + 10,  // A: 10-30%
+          Math.floor(Math.random() * 20) + 40,  // B: 40-60% (typically correct)
+          Math.floor(Math.random() * 20) + 5,   // C: 5-25%
+          Math.floor(Math.random() * 15) + 5    // D: 5-20%
+        ];
+        
+        // Normalize to 100%
+        const total = votes.reduce((sum, v) => sum + v, 0);
+        const normalized = votes.map(v => Math.round((v / total) * 100));
+        
+        // Adjust to make sure it's exactly 100%
+        const diff = 100 - normalized.reduce((sum, v) => sum + v, 0);
+        normalized[0] += diff;
+        
+        setAudienceVotesDisplay(normalized);
+      }
     } else {
-      setAudienceVotes([]);
+      setAudienceVotesDisplay([]);
     }
-  }, [activeLifeline]);
+  }, [activeLifeline, audienceVotes, getTotalVotes, getVotePercentage, isPresentation]);
 
   const renderLifelineIcon = (id: string, used: boolean) => {
     const commonClass = cn(
@@ -90,7 +103,7 @@ export default function Lifelines({
   };
 
   const renderAudienceResults = () => {
-    if (activeLifeline !== "audience" || audienceVotes.length === 0) return null;
+    if (activeLifeline !== "audience" || audienceVotesDisplay.length === 0) return null;
     
     const letters = ["A", "B", "C", "D"];
     
@@ -98,7 +111,7 @@ export default function Lifelines({
       <div className="mt-4 bg-gray-800 p-4 rounded-lg">
         <h3 className="text-white text-center mb-3 font-semibold">Audience Results</h3>
         <div className="space-y-3">
-          {audienceVotes.map((vote, idx) => (
+          {audienceVotesDisplay.map((vote, idx) => (
             <div key={idx} className="flex items-center space-x-2">
               <span className="text-white w-6">{letters[idx]}</span>
               <div className="flex-1 bg-gray-700 h-5 rounded-full overflow-hidden">
@@ -122,11 +135,10 @@ export default function Lifelines({
       <div className="mt-4 bg-gray-800 p-4 rounded-lg">
         <div className="flex items-center mb-2">
           <Phone className="h-5 w-5 text-blue-400 mr-2" />
-          <h3 className="text-white font-semibold">Your friend says:</h3>
+          <h3 className="text-white font-semibold">
+            We used the Phone a Friend lifeline
+          </h3>
         </div>
-        <p className="text-white italic">
-          "I'm not 100% sure, but I think the answer is B. It sounds the most reasonable to me."
-        </p>
       </div>
     );
   };

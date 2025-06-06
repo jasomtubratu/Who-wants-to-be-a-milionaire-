@@ -9,6 +9,8 @@ export type Question = {
   answers: Answer[];
   value: number;
   category: string;
+  explanation: string;
+  hostNotes?: string;
 };
 
 export type Lifeline = {
@@ -17,6 +19,13 @@ export type Lifeline = {
   description: string;
   icon: string;
   used: boolean;
+};
+
+export type QuestionResult = {
+  questionIndex: number;
+  correct: boolean;
+  selectedAnswer: number;
+  correctAnswer: number;
 };
 
 export type GameState = {
@@ -29,4 +38,11 @@ export type GameState = {
   gameOver: boolean;
   wonAmount: number;
   activeLifeline: string | null;
+  questionResults: QuestionResult[];
+  showIntro: boolean;
+  showExplanation: boolean;
+  showCalling: boolean;
+  showCountdown: boolean;
+  audienceVotes: { [key: string]: number };
+  votingActive: boolean;
 };

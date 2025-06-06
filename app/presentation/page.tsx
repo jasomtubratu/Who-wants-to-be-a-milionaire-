@@ -9,6 +9,8 @@ import AnswerOption from "@/components/AnswerOption";
 import MoneyLadder from "@/components/MoneyLadder";
 import Lifelines from "@/components/Lifelines";
 import GameOver from "@/components/GameOver";
+import VideoModal from "@/components/VideoModal";
+import ExplanationModal from "@/components/ExplanationModal";
 import { useGameStore } from "@/lib/gameStore";
 import { questions } from "@/lib/questions";
 import { initSocket } from "@/lib/socket";
@@ -19,6 +21,10 @@ export default function PresentationPage() {
 
   useEffect(() => {
     const socket = initSocket();
+
+    socket.on('introShown', () => {
+      gameStore.setShowIntro(true);
+    });
 
     socket.on('questionRevealed', () => {
       gameStore.revealQuestion();
@@ -58,7 +64,29 @@ export default function PresentationPage() {
       gameStore.endGame(won);
     });
 
+    socket.on('explanationShown', () => {
+      gameStore.setShowExplanation(true);
+    });
+
+    socket.on('phonePickedUp', () => {
+      gameStore.setShowCalling(false);
+      gameStore.setShowCountdown(true);
+    });
+
+    socket.on('phoneCallEnded', () => {
+      gameStore.setShowCountdown(false);
+    });
+
+    socket.on('votingEnded', () => {
+      gameStore.setVotingActive(false);
+    });
+
+    socket.on('voteReceived', (data: { answer: string }) => {
+      gameStore.addVote(data.answer);
+    });
+
     return () => {
+      socket.off('introShown');
       socket.off('questionRevealed');
       socket.off('answersRevealed');
       socket.off('answerSelected');
@@ -66,6 +94,11 @@ export default function PresentationPage() {
       socket.off('lifelineUsed');
       socket.off('questionAdvanced');
       socket.off('gameEnded');
+      socket.off('explanationShown');
+      socket.off('phonePickedUp');
+      socket.off('phoneCallEnded');
+      socket.off('votingEnded');
+      socket.off('voteReceived');
     };
   }, []);
 
@@ -73,6 +106,16 @@ export default function PresentationPage() {
 
   const handleGoHome = () => {
     router.push('/');
+  };
+
+  const getTotalVotes = () => {
+    return Object.values(gameStore.audienceVotes).reduce((sum, votes) => sum + votes, 0);
+  };
+
+  const getVotePercentage = (letter: string) => {
+    const total = getTotalVotes();
+    if (total === 0) return 0;
+    return Math.round(((gameStore.audienceVotes[letter] || 0) / total) * 100);
   };
 
   return (
@@ -105,6 +148,9 @@ export default function PresentationPage() {
               onUseAskAudience={() => {}}
               activeLifeline={gameStore.activeLifeline}
               isPresentation={true}
+              audienceVotes={gameStore.audienceVotes}
+              getTotalVotes={getTotalVotes}
+              getVotePercentage={getVotePercentage}
             />
             
             <QuestionDisplay 
@@ -139,6 +185,34 @@ export default function PresentationPage() {
           </div>
         </div>
       </div>
+
+      <VideoModal
+        src="/intro.mp4"
+        isOpen={gameStore.showIntro}
+        onClose={() => gameStore.setShowIntro(false)}
+        autoClose={true}
+      />
+
+      <VideoModal
+        src="/calling-480p.mp4"
+        isOpen={gameStore.showCalling}
+        onClose={() => gameStore.setShowCalling(false)}
+        loop={true}
+      />
+
+      <VideoModal
+        src="/countdown.mp4"
+        isOpen={gameStore.showCountdown}
+        onClose={() => gameStore.setShowCountdown(false)}
+        autoClose={true}
+      />
+
+      <ExplanationModal
+        isOpen={gameStore.showExplanation}
+        onClose={() => gameStore.setShowExplanation(false)}
+        explanation={currentQuestion.explanation}
+        questionText={currentQuestion.text}
+      />
       
       {gameStore.gameOver && (
         <GameOver 

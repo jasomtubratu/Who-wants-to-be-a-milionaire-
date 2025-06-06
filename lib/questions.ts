@@ -15,7 +15,9 @@ export const questions: Question[] = [
       { text: "Saturn", isCorrect: false }
     ],
     value: 100,
-    category: "Science"
+    category: "Science",
+    explanation: "Mars is called the Red Planet because of iron oxide (rust) on its surface, which gives it a reddish appearance.",
+    hostNotes: "Easy starter question. Mars is easily recognizable by its red color in the night sky."
   },
   {
     id: "q2",
@@ -27,7 +29,9 @@ export const questions: Question[] = [
       { text: "Michelangelo", isCorrect: false }
     ],
     value: 200,
-    category: "Art"
+    category: "Art",
+    explanation: "Leonardo da Vinci painted the Mona Lisa between 1503-1519. It's housed in the Louvre Museum in Paris.",
+    hostNotes: "Classic art question. The Mona Lisa is probably the most famous painting in the world."
   },
   {
     id: "q3",
@@ -39,7 +43,9 @@ export const questions: Question[] = [
       { text: "Bangkok", isCorrect: false }
     ],
     value: 300,
-    category: "Geography"
+    category: "Geography",
+    explanation: "Tokyo has been Japan's capital since 1868, when the imperial court moved there from Kyoto.",
+    hostNotes: "Straightforward geography. Tokyo is one of the world's largest metropolitan areas."
   },
   {
     id: "q4",
@@ -51,7 +57,9 @@ export const questions: Question[] = [
       { text: "Oganesson", isCorrect: false }
     ],
     value: 500,
-    category: "Science"
+    category: "Science",
+    explanation: "Oxygen has the chemical symbol 'O' and is essential for most life on Earth. It makes up about 21% of our atmosphere.",
+    hostNotes: "Basic chemistry. Gold is Au, Osmium is Os, Oganesson is Og."
   },
   {
     id: "q5",
@@ -63,7 +71,9 @@ export const questions: Question[] = [
       { text: "Mark Twain", isCorrect: false }
     ],
     value: 1000,
-    category: "Literature"
+    category: "Literature",
+    explanation: "William Shakespeare wrote Romeo and Juliet around 1595. It's one of his most famous tragedies about young love.",
+    hostNotes: "First milestone question. Shakespeare is the most famous English playwright."
   },
   {
     id: "q6",
@@ -75,7 +85,9 @@ export const questions: Question[] = [
       { text: "Brazil", isCorrect: false }
     ],
     value: 2000,
-    category: "Geography"
+    category: "Geography",
+    explanation: "Kangaroos are native to Australia and are found nowhere else in the wild. They're Australia's national symbol.",
+    hostNotes: "Animal geography. Kangaroos are marsupials unique to Australia."
   },
   {
     id: "q7",
@@ -87,7 +99,9 @@ export const questions: Question[] = [
       { text: "Pacific Ocean", isCorrect: true }
     ],
     value: 4000,
-    category: "Geography"
+    category: "Geography",
+    explanation: "The Pacific Ocean covers about 46% of Earth's water surface and is larger than all land areas combined.",
+    hostNotes: "The Pacific is massive - it's larger than all continents put together."
   },
   {
     id: "q8",
@@ -99,7 +113,9 @@ export const questions: Question[] = [
       { text: "Ernest Hemingway", isCorrect: false }
     ],
     value: 8000,
-    category: "Literature"
+    category: "Literature",
+    explanation: "Harper Lee published 'To Kill a Mockingbird' in 1960. It won the Pulitzer Prize and deals with racial injustice.",
+    hostNotes: "Classic American literature. Lee famously published very little after this masterpiece."
   },
   {
     id: "q9",
@@ -111,7 +127,9 @@ export const questions: Question[] = [
       { text: "3", isCorrect: false }
     ],
     value: 16000,
-    category: "Mathematics"
+    category: "Mathematics",
+    explanation: "2 is the smallest prime number and the only even prime number. A prime number is only divisible by 1 and itself.",
+    hostNotes: "Math concept question. 1 is not considered prime by modern definition."
   },
   {
     id: "q10",
@@ -123,7 +141,9 @@ export const questions: Question[] = [
       { text: "Ruby", isCorrect: false }
     ],
     value: 32000,
-    category: "Technology"
+    category: "Technology",
+    explanation: "While Python, Java, and Ruby are all programming languages, Cobra is not a mainstream programming language.",
+    hostNotes: "Second milestone. There is actually a Cobra language, but it's very obscure compared to the others."
   },
   {
     id: "q11",
@@ -135,7 +155,9 @@ export const questions: Question[] = [
       { text: "1931", isCorrect: false }
     ],
     value: 64000,
-    category: "History"
+    category: "History",
+    explanation: "The RMS Titanic sank on April 15, 1912, after hitting an iceberg during its maiden voyage from Southampton to New York.",
+    hostNotes: "Famous historical disaster. The ship was considered 'unsinkable' but sank in less than 3 hours."
   },
   {
     id: "q12",
@@ -147,7 +169,9 @@ export const questions: Question[] = [
       { text: "Galileo Galilei", isCorrect: false }
     ],
     value: 125000,
-    category: "Science"
+    category: "Science",
+    explanation: "Albert Einstein developed both special (1905) and general (1915) theories of relativity, revolutionizing our understanding of space and time.",
+    hostNotes: "Einstein is probably the most famous scientist. His theories changed physics forever."
   },
   {
     id: "q13",
@@ -159,7 +183,9 @@ export const questions: Question[] = [
       { text: "Canberra", isCorrect: true }
     ],
     value: 250000,
-    category: "Geography"
+    category: "Geography",
+    explanation: "Canberra was purpose-built as Australia's capital in 1913, chosen as a compromise between Sydney and Melbourne.",
+    hostNotes: "Tricky question - many people think it's Sydney or Melbourne. Canberra was built specifically to be the capital."
   },
   {
     id: "q14",
@@ -171,7 +197,9 @@ export const questions: Question[] = [
       { text: "The Temple of Artemis", isCorrect: false }
     ],
     value: 500000,
-    category: "History"
+    category: "History",
+    explanation: "The Lighthouse of Alexandria (Pharos) was one of the Seven Wonders of the Ancient World, built around 280 BC.",
+    hostNotes: "Advanced history question. The lighthouse was over 100 meters tall and guided ships for over 1,000 years."
   },
   {
     id: "q15",
@@ -183,7 +211,9 @@ export const questions: Question[] = [
       { text: "Nitrogen", isCorrect: true }
     ],
     value: 1000000,
-    category: "Science"
+    category: "Science",
+    explanation: "Nitrogen makes up about 78% of Earth's atmosphere, while oxygen is about 21%. This might surprise many people!",
+    hostNotes: "Million dollar question! Many people think it's oxygen, but nitrogen is much more abundant."
   }
 ];
 

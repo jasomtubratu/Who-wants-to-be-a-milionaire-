@@ -16,6 +16,10 @@ const SocketHandler = (req: any, res: any) => {
   io.on('connection', (socket) => {
     console.log('Client connected');
 
+    socket.on('showIntro', (data) => {
+      socket.broadcast.emit('introShown', data);
+    });
+
     socket.on('revealQuestion', (data) => {
       socket.broadcast.emit('questionRevealed', data);
     });
@@ -42,6 +46,26 @@ const SocketHandler = (req: any, res: any) => {
 
     socket.on('gameOver', (data) => {
       socket.broadcast.emit('gameEnded', data);
+    });
+
+    socket.on('showExplanation', (data) => {
+      socket.broadcast.emit('explanationShown', data);
+    });
+
+    socket.on('phonePickedUp', (data) => {
+      socket.broadcast.emit('phonePickedUp', data);
+    });
+
+    socket.on('endPhoneCall', (data) => {
+      socket.broadcast.emit('phoneCallEnded', data);
+    });
+
+    socket.on('vote', (data) => {
+      socket.broadcast.emit('voteReceived', data);
+    });
+
+    socket.on('endVoting', (data) => {
+      socket.broadcast.emit('votingEnded', data);
     });
 
     socket.on('disconnect', () => {

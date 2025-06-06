@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { questions, moneyLadder, lifelines } from './questions';
-import type { GameState, Lifeline } from './types';
+import type { GameState, Lifeline, QuestionResult } from './types';
 
 interface GameStore extends GameState {
   lifelines: Lifeline[];
@@ -18,6 +18,13 @@ interface GameStore extends GameState {
   useAskAudience: () => void;
   setActiveLifeline: (id: string | null) => void;
   endGame: (won: boolean) => void;
+  setShowIntro: (show: boolean) => void;
+  setShowExplanation: (show: boolean) => void;
+  setShowCalling: (show: boolean) => void;
+  setShowCountdown: (show: boolean) => void;
+  addVote: (answer: string) => void;
+  setVotingActive: (active: boolean) => void;
+  clearVotes: () => void;
 }
 
 export const useGameStore = create<GameStore>()(
@@ -32,6 +39,13 @@ export const useGameStore = create<GameStore>()(
       gameOver: false,
       wonAmount: 0,
       activeLifeline: null,
+      questionResults: [],
+      showIntro: false,
+      showExplanation: false,
+      showCalling: false,
+      showCountdown: false,
+      audienceVotes: {},
+      votingActive: false,
       lifelines: JSON.parse(JSON.stringify(lifelines)),
 
       resetGame: () => set({
@@ -44,6 +58,13 @@ export const useGameStore = create<GameStore>()(
         gameOver: false,
         wonAmount: 0,
         activeLifeline: null,
+        questionResults: [],
+        showIntro: false,
+        showExplanation: false,
+        showCalling: false,
+        showCountdown: false,
+        audienceVotes: {},
+        votingActive: false,
         lifelines: JSON.parse(JSON.stringify(lifelines))
       }),
 
@@ -53,7 +74,24 @@ export const useGameStore = create<GameStore>()(
       
       selectAnswer: (index: number) => set({ selectedAnswer: index }),
       
-      revealCorrectAnswer: () => set({ correctAnswerRevealed: true }),
+      revealCorrectAnswer: () => {
+        const state = get();
+        const currentQuestion = questions[state.currentQuestionIndex];
+        const correctAnswerIndex = currentQuestion.answers.findIndex(a => a.isCorrect);
+        const isCorrect = state.selectedAnswer === correctAnswerIndex;
+        
+        const newResult: QuestionResult = {
+          questionIndex: state.currentQuestionIndex,
+          correct: isCorrect,
+          selectedAnswer: state.selectedAnswer!,
+          correctAnswer: correctAnswerIndex
+        };
+        
+        set({ 
+          correctAnswerRevealed: true,
+          questionResults: [...state.questionResults, newResult]
+        });
+      },
       
       nextQuestion: () => {
         const state = get();
@@ -69,7 +107,10 @@ export const useGameStore = create<GameStore>()(
             correctAnswerRevealed: false,
             eliminatedAnswers: [],
             wonAmount: newWonAmount,
-            activeLifeline: null
+            activeLifeline: null,
+            showExplanation: false,
+            audienceVotes: {},
+            votingActive: false
           });
         } else {
           set({
@@ -112,7 +153,8 @@ export const useGameStore = create<GameStore>()(
         
         set({
           lifelines: updatedLifelines,
-          activeLifeline: "phone"
+          activeLifeline: "phone",
+          showCalling: true
         });
       },
       
@@ -123,7 +165,9 @@ export const useGameStore = create<GameStore>()(
         
         set({
           lifelines: updatedLifelines,
-          activeLifeline: "audience"
+          activeLifeline: "audience",
+          votingActive: true,
+          audienceVotes: {}
         });
       },
       
@@ -137,7 +181,26 @@ export const useGameStore = create<GameStore>()(
           gameOver: true,
           wonAmount: finalAmount
         });
-      }
+      },
+
+      setShowIntro: (show: boolean) => set({ showIntro: show }),
+      setShowExplanation: (show: boolean) => set({ showExplanation: show }),
+      setShowCalling: (show: boolean) => set({ showCalling: show }),
+      setShowCountdown: (show: boolean) => set({ showCountdown: show }),
+
+      addVote: (answer: string) => {
+        const state = get();
+        const currentVotes = state.audienceVotes[answer] || 0;
+        set({
+          audienceVotes: {
+            ...state.audienceVotes,
+            [answer]: currentVotes + 1
+          }
+        });
+      },
+
+      setVotingActive: (active: boolean) => set({ votingActive: active }),
+      clearVotes: () => set({ audienceVotes: {} })
     }),
     {
       name: 'millionaire-game-storage',

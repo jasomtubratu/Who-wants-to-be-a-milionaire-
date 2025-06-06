@@ -1,10 +1,10 @@
-in the prize list it will show if correct or not correctr background color 
 assets music
-intro wehn started trigger
 modals with audience
 
 countdown when telephoning to a friend
 
 hlasovanie ako voting z publika cez noramlne pods tranku /voting na telefon kompatibilne
 
-explication
+fix 50/50
+
+fix voting 
