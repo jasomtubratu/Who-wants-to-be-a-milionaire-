@@ -1,10 +1,2 @@
 assets music
-modals with audience
-
-countdown when telephoning to a friend
-
-hlasovanie ako voting z publika cez noramlne pods tranku /voting na telefon kompatibilne
-
 fix 50/50
-
-fix voting 
