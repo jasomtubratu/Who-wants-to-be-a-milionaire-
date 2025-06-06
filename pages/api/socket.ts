@@ -20,8 +20,8 @@ const SocketHandler = (req: any, res: any) => {
       socket.broadcast.emit('introShown', data);
     });
 
-    socket.on('revealQuestion', (data) => {
-      socket.broadcast.emit('questionRevealed', data);
+    socket.on('revealQuestion', (questionIndex) => {
+      socket.broadcast.emit('questionRevealed', questionIndex);
     });
 
     socket.on('revealAnswers', (data) => {

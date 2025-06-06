@@ -135,10 +135,11 @@ export default function Lifelines({
       <div className="mt-4 bg-gray-800 p-4 rounded-lg">
         <div className="flex items-center mb-2">
           <Phone className="h-5 w-5 text-blue-400 mr-2" />
-          <h3 className="text-white font-semibold">
-            We used the Phone a Friend lifeline
-          </h3>
+          <h3 className="text-white font-semibold">Your friend says:</h3>
         </div>
+        <p className="text-white italic">
+          "I'm not 100% sure, but I think the answer is B. It sounds the most reasonable to me."
+        </p>
       </div>
     );
   };

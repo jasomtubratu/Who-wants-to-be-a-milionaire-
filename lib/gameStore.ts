@@ -25,6 +25,7 @@ interface GameStore extends GameState {
   addVote: (answer: string) => void;
   setVotingActive: (active: boolean) => void;
   clearVotes: () => void;
+  setEliminatedAnswers: (answers: number[]) => void;
 }
 
 export const useGameStore = create<GameStore>()(
@@ -200,7 +201,8 @@ export const useGameStore = create<GameStore>()(
       },
 
       setVotingActive: (active: boolean) => set({ votingActive: active }),
-      clearVotes: () => set({ audienceVotes: {} })
+      clearVotes: () => set({ audienceVotes: {} }),
+      setEliminatedAnswers: (answers: number[]) => set({ eliminatedAnswers: answers })
     }),
     {
       name: 'millionaire-game-storage',

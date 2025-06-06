@@ -14,6 +14,7 @@ import ExplanationModal from "@/components/ExplanationModal";
 import { useGameStore } from "@/lib/gameStore";
 import { questions } from "@/lib/questions";
 import { initSocket } from "@/lib/socket";
+import { audioManager } from "@/lib/audio";
 
 export default function PresentationPage() {
   const router = useRouter();
@@ -26,8 +27,9 @@ export default function PresentationPage() {
       gameStore.setShowIntro(true);
     });
 
-    socket.on('questionRevealed', () => {
+    socket.on('questionRevealed', (questionIndex: number) => {
       gameStore.revealQuestion();
+      audioManager.playQuestionReveal(questionIndex);
     });
 
     socket.on('answersRevealed', () => {
@@ -36,15 +38,25 @@ export default function PresentationPage() {
 
     socket.on('answerSelected', (index: number) => {
       gameStore.selectAnswer(index);
+      audioManager.playFinalAnswer();
     });
 
-    socket.on('correctAnswerRevealed', () => {
+    socket.on('correctAnswerRevealed', (data: { isCorrect: boolean }) => {
       gameStore.revealCorrectAnswer();
+      
+      if (data.isCorrect) {
+        audioManager.playCorrectAnswer();
+      } else {
+        audioManager.playIncorrectAnswer();
+      }
     });
 
-    socket.on('lifelineUsed', (data: { type: string }) => {
+    socket.on('lifelineUsed', (data: { type: string; eliminatedAnswers?: number[] }) => {
       switch (data.type) {
         case 'fifty':
+          if (data.eliminatedAnswers) {
+            gameStore.setEliminatedAnswers(data.eliminatedAnswers);
+          }
           gameStore.useFiftyFifty();
           break;
         case 'phone':
@@ -187,21 +199,21 @@ export default function PresentationPage() {
       </div>
 
       <VideoModal
-        src="/intro.mp4"
+        src="/assets/intro.mp4"
         isOpen={gameStore.showIntro}
         onClose={() => gameStore.setShowIntro(false)}
         autoClose={true}
       />
 
       <VideoModal
-        src="/calling-480p.mp4"
+        src="/assets/calling-480p.mp4"
         isOpen={gameStore.showCalling}
         onClose={() => gameStore.setShowCalling(false)}
         loop={true}
       />
 
       <VideoModal
-        src="/countdown.mp4"
+        src="/assets/countdown.mp4"
         isOpen={gameStore.showCountdown}
         onClose={() => gameStore.setShowCountdown(false)}
         autoClose={true}

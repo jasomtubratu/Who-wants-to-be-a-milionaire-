@@ -16,7 +16,9 @@ import {
   Phone,
   PhoneCall,
   Users,
-  BarChart3
+  BarChart3,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import QuestionDisplay from "@/components/QuestionDisplay";
 import AnswerOption from "@/components/AnswerOption";
@@ -27,6 +29,7 @@ import ExplanationModal from "@/components/ExplanationModal";
 import { useGameStore } from "@/lib/gameStore";
 import { questions } from "@/lib/questions";
 import { initSocket, getSocket } from "@/lib/socket";
+import { audioManager } from "@/lib/audio";
 
 export default function HostPage() {
   const router = useRouter();
@@ -56,8 +59,9 @@ export default function HostPage() {
   };
 
   const handleRevealQuestion = () => {
-    getSocket().emit('revealQuestion');
+    getSocket().emit('revealQuestion', gameStore.currentQuestionIndex);
     gameStore.revealQuestion();
+    audioManager.playQuestionReveal(gameStore.currentQuestionIndex);
   };
 
   const handleRevealAnswers = () => {
@@ -68,11 +72,19 @@ export default function HostPage() {
   const handleSelectAnswer = (index: number) => {
     getSocket().emit('selectAnswer', index);
     gameStore.selectAnswer(index);
+    audioManager.playFinalAnswer();
   };
 
   const handleRevealCorrectAnswer = () => {
-    getSocket().emit('revealCorrectAnswer');
+    const isCorrect = gameStore.selectedAnswer === correctAnswerIndex;
+    getSocket().emit('revealCorrectAnswer', { isCorrect });
     gameStore.revealCorrectAnswer();
+    
+    if (isCorrect) {
+      audioManager.playCorrectAnswer();
+    } else {
+      audioManager.playIncorrectAnswer();
+    }
   };
 
   const handleNextQuestion = () => {
@@ -88,17 +100,31 @@ export default function HostPage() {
   };
 
   const handleUseLifeline = (type: string) => {
-    getSocket().emit('useLifeline', { type });
-    switch (type) {
-      case 'fifty':
-        gameStore.useFiftyFifty();
-        break;
-      case 'phone':
-        gameStore.usePhoneFriend();
-        break;
-      case 'audience':
-        gameStore.useAskAudience();
-        break;
+    if (type === 'fifty') {
+      const currentQuestion = questions[gameStore.currentQuestionIndex];
+      
+      // Find incorrect answers
+      const incorrectIndices = currentQuestion.answers
+        .map((answer, index) => ({ index, isCorrect: answer.isCorrect }))
+        .filter(answer => !answer.isCorrect)
+        .map(answer => answer.index);
+      
+      // Randomly select two to eliminate
+      const shuffled = [...incorrectIndices].sort(() => 0.5 - Math.random());
+      const toEliminate = shuffled.slice(0, 2);
+      
+      getSocket().emit('useLifeline', { type, eliminatedAnswers: toEliminate });
+      gameStore.useFiftyFifty();
+    } else {
+      getSocket().emit('useLifeline', { type });
+      switch (type) {
+        case 'phone':
+          gameStore.usePhoneFriend();
+          break;
+        case 'audience':
+          gameStore.useAskAudience();
+          break;
+      }
     }
   };
 
@@ -123,6 +149,11 @@ export default function HostPage() {
     gameStore.setVotingActive(false);
   };
 
+  const toggleAudio = () => {
+    const newState = !audioManager.isAudioEnabled();
+    audioManager.setEnabled(newState);
+  };
+
   const getTotalVotes = () => {
     return Object.values(gameStore.audienceVotes).reduce((sum, votes) => sum + votes, 0);
   };
@@ -139,6 +170,14 @@ export default function HostPage() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-white">Host View</h1>
           <div className="flex gap-2">
+            <Button variant="outline" onClick={toggleAudio}>
+              {audioManager.isAudioEnabled() ? (
+                <Volume2 className="mr-2 h-4 w-4" />
+              ) : (
+                <VolumeX className="mr-2 h-4 w-4" />
+              )}
+              Audio
+            </Button>
             <Button variant="outline" onClick={handleShowIntro}>
               <Play className="mr-2 h-4 w-4" />
               Show Intro
