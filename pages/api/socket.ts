@@ -48,10 +48,6 @@ const SocketHandler = (req: any, res: any) => {
       socket.broadcast.emit('gameEnded', data);
     });
 
-    socket.on('showExplanation', (data) => {
-      socket.broadcast.emit('explanationShown', data);
-    });
-
     socket.on('phonePickedUp', (data) => {
       socket.broadcast.emit('phonePickedUp', data);
     });
@@ -70,6 +66,18 @@ const SocketHandler = (req: any, res: any) => {
 
     socket.on('audioToggle', (data) => {
       socket.broadcast.emit('audioToggle', data);
+    });
+
+    socket.on('showNameWheel', (data) => {
+      socket.broadcast.emit('showNameWheel', data);
+    });
+
+    socket.on('nameSelected', (data) => {
+      socket.broadcast.emit('nameSelected', data);
+    });
+
+    socket.on('hideNameWheel', (data) => {
+      socket.broadcast.emit('hideNameWheel', data);
     });
 
     socket.on('disconnect', () => {

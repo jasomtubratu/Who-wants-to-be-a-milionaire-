@@ -10,7 +10,7 @@ import MoneyLadder from "@/components/MoneyLadder";
 import Lifelines from "@/components/Lifelines";
 import GameOver from "@/components/GameOver";
 import VideoModal from "@/components/VideoModal";
-import ExplanationModal from "@/components/ExplanationModal";
+import NameWheel from "@/components/NameWheel";
 import { useGameStore } from "@/lib/gameStore";
 import { questions } from "@/lib/questions";
 import { initSocket } from "@/lib/socket";
@@ -76,10 +76,6 @@ export default function PresentationPage() {
       gameStore.endGame(won);
     });
 
-    socket.on('explanationShown', () => {
-      gameStore.setShowExplanation(true);
-    });
-
     socket.on('phonePickedUp', () => {
       gameStore.setShowCalling(false);
       gameStore.setShowCountdown(true);
@@ -101,6 +97,21 @@ export default function PresentationPage() {
       audioManager.setEnabled(data.enabled);
     });
 
+    socket.on('showNameWheel', (data: { spinning: boolean }) => {
+      gameStore.setShowNameWheel(true);
+      gameStore.setNameWheelSpinning(data.spinning);
+    });
+
+    socket.on('nameSelected', (data: { name: string }) => {
+      gameStore.setSelectedName(data.name);
+      gameStore.setNameWheelSpinning(false);
+    });
+
+    socket.on('hideNameWheel', () => {
+      gameStore.setShowNameWheel(false);
+      gameStore.setSelectedName(null);
+    });
+
     return () => {
       socket.off('introShown');
       socket.off('questionRevealed');
@@ -110,12 +121,14 @@ export default function PresentationPage() {
       socket.off('lifelineUsed');
       socket.off('questionAdvanced');
       socket.off('gameEnded');
-      socket.off('explanationShown');
       socket.off('phonePickedUp');
       socket.off('phoneCallEnded');
       socket.off('votingEnded');
       socket.off('voteReceived');
       socket.off('audioToggle');
+      socket.off('showNameWheel');
+      socket.off('nameSelected');
+      socket.off('hideNameWheel');
     };
   }, []);
 
@@ -225,11 +238,11 @@ export default function PresentationPage() {
         autoClose={true}
       />
 
-      <ExplanationModal
-        isOpen={gameStore.showExplanation}
-        onClose={() => gameStore.setShowExplanation(false)}
-        explanation={currentQuestion.explanation}
-        questionText={currentQuestion.text}
+      <NameWheel
+        isOpen={gameStore.showNameWheel}
+        onClose={() => gameStore.setShowNameWheel(false)}
+        selectedName={gameStore.selectedName || undefined}
+        isSpinning={gameStore.nameWheelSpinning}
       />
       
       {gameStore.gameOver && (

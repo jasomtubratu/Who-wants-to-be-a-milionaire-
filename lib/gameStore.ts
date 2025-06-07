@@ -26,6 +26,9 @@ interface GameStore extends GameState {
   setVotingActive: (active: boolean) => void;
   clearVotes: () => void;
   setEliminatedAnswers: (answers: number[]) => void;
+  setShowNameWheel: (show: boolean) => void;
+  setNameWheelSpinning: (spinning: boolean) => void;
+  setSelectedName: (name: string | null) => void;
 }
 
 export const useGameStore = create<GameStore>()(
@@ -47,6 +50,9 @@ export const useGameStore = create<GameStore>()(
       showCountdown: false,
       audienceVotes: {},
       votingActive: false,
+      showNameWheel: false,
+      nameWheelSpinning: false,
+      selectedName: null,
       lifelines: JSON.parse(JSON.stringify(lifelines)),
 
       resetGame: () => set({
@@ -66,6 +72,9 @@ export const useGameStore = create<GameStore>()(
         showCountdown: false,
         audienceVotes: {},
         votingActive: false,
+        showNameWheel: false,
+        nameWheelSpinning: false,
+        selectedName: null,
         lifelines: JSON.parse(JSON.stringify(lifelines))
       }),
 
@@ -202,7 +211,10 @@ export const useGameStore = create<GameStore>()(
 
       setVotingActive: (active: boolean) => set({ votingActive: active }),
       clearVotes: () => set({ audienceVotes: {} }),
-      setEliminatedAnswers: (answers: number[]) => set({ eliminatedAnswers: answers })
+      setEliminatedAnswers: (answers: number[]) => set({ eliminatedAnswers: answers }),
+      setShowNameWheel: (show: boolean) => set({ showNameWheel: show }),
+      setNameWheelSpinning: (spinning: boolean) => set({ nameWheelSpinning: spinning }),
+      setSelectedName: (name: string | null) => set({ selectedName: name })
     }),
     {
       name: 'millionaire-game-storage',

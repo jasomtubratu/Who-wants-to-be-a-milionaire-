@@ -18,16 +18,17 @@ import {
   Users,
   BarChart3,
   Volume2,
-  VolumeX
+  VolumeX,
+  Shuffle
 } from "lucide-react";
 import QuestionDisplay from "@/components/QuestionDisplay";
 import AnswerOption from "@/components/AnswerOption";
 import MoneyLadder from "@/components/MoneyLadder";
 import Lifelines from "@/components/Lifelines";
 import GameOver from "@/components/GameOver";
-import ExplanationModal from "@/components/ExplanationModal";
 import { useGameStore } from "@/lib/gameStore";
 import { questions } from "@/lib/questions";
+import { names } from "@/lib/names";
 import { initSocket, getSocket } from "@/lib/socket";
 import { audioManager } from "@/lib/audio";
 
@@ -125,7 +126,6 @@ export default function HostPage() {
   };
 
   const handleShowExplanation = () => {
-    getSocket().emit('showExplanation');
     gameStore.setShowExplanation(true);
   };
 
@@ -143,6 +143,27 @@ export default function HostPage() {
   const handleEndVoting = () => {
     getSocket().emit('endVoting');
     gameStore.setVotingActive(false);
+  };
+
+  const handlePickName = () => {
+    // Start spinning animation
+    gameStore.setShowNameWheel(true);
+    gameStore.setNameWheelSpinning(true);
+    getSocket().emit('showNameWheel', { spinning: true });
+    
+    // After 3 seconds, stop spinning and select a random name
+    setTimeout(() => {
+      const randomName = names[Math.floor(Math.random() * names.length)];
+      gameStore.setSelectedName(randomName);
+      gameStore.setNameWheelSpinning(false);
+      getSocket().emit('nameSelected', { name: randomName });
+    }, 3000);
+  };
+
+  const handleCloseNameWheel = () => {
+    gameStore.setShowNameWheel(false);
+    gameStore.setSelectedName(null);
+    getSocket().emit('hideNameWheel');
   };
 
   const toggleAudio = () => {
@@ -175,6 +196,10 @@ export default function HostPage() {
                 <VolumeX className="mr-2 h-4 w-4" />
               )}
               Audio
+            </Button>
+            <Button variant="outline" onClick={handlePickName}>
+              <Shuffle className="mr-2 h-4 w-4" />
+              Pick Name
             </Button>
             <Button variant="outline" onClick={handleShowIntro}>
               <Play className="mr-2 h-4 w-4" />
@@ -390,20 +415,73 @@ export default function HostPage() {
             </Card>
           </div>
           
-          <div className="md:col-span-1">
-            <Card className="bg-gray-800 border-gray-700 h-full">
+          <div className="md:col-span-1 space-y-4">
+            <Card className="bg-gray-800 border-gray-700 h-fit">
               <MoneyLadder currentQuestionIndex={gameStore.currentQuestionIndex} />
             </Card>
+            
+            {gameStore.showExplanation && (
+              <Card className="bg-gray-800 border-gray-700 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center">
+                    <BookOpen className="h-5 w-5 text-blue-400 mr-2" />
+                    <h3 className="text-lg font-semibold text-white">Explanation</h3>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => gameStore.setShowExplanation(false)}
+                  >
+                    <X className="h-4 w-4 text-white" />
+                  </Button>
+                </div>
+                
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="text-blue-400 font-medium mb-1 text-sm">Question:</h4>
+                    <p className="text-white text-sm">{currentQuestion.text}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-green-400 font-medium mb-1 text-sm">Explanation:</h4>
+                    <p className="text-white text-sm leading-relaxed">{currentQuestion.explanation}</p>
+                  </div>
+                </div>
+              </Card>
+            )}
+
+            {gameStore.showNameWheel && (
+              <Card className="bg-gray-800 border-gray-700 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold text-white">Name Picker</h3>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleCloseNameWheel}
+                  >
+                    <X className="h-4 w-4 text-white" />
+                  </Button>
+                </div>
+                
+                {gameStore.nameWheelSpinning ? (
+                  <div className="text-center py-4">
+                    <p className="text-blue-400 animate-pulse">Spinning wheel...</p>
+                  </div>
+                ) : gameStore.selectedName ? (
+                  <div className="text-center py-4">
+                    <p className="text-green-400 text-sm mb-1">Selected:</p>
+                    <p className="text-white text-lg font-bold">{gameStore.selectedName}</p>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-gray-400">Click "Pick Name" to start</p>
+                  </div>
+                )}
+              </Card>
+            )}
           </div>
         </div>
       </div>
-      
-      <ExplanationModal
-        isOpen={gameStore.showExplanation}
-        onClose={() => gameStore.setShowExplanation(false)}
-        explanation={currentQuestion.explanation}
-        questionText={currentQuestion.text}
-      />
       
       {gameStore.gameOver && (
         <GameOver 

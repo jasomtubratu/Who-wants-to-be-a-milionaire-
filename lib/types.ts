@@ -45,4 +45,7 @@ export type GameState = {
   showCountdown: boolean;
   audienceVotes: { [key: string]: number };
   votingActive: boolean;
+  showNameWheel: boolean;
+  nameWheelSpinning: boolean;
+  selectedName: string | null;
 };

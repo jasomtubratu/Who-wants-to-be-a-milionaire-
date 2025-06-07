@@ -1,5 +1,10 @@
 import { Question } from "./types";
 
+export const moneyLadder = [
+  100, 200, 300, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 1000000
+];
+
+
 export const questions: Question[] = [
   {
     id: "q1",
@@ -85,9 +90,9 @@ export const questions: Question[] = [
     id: "q6",
     text: "Ktorá črta neplatí pre plazy?",
     answers: [
-      { text: "Sú ektotermné", isCorrect: false },
+      { text: "Niesú ektotermné", isCorrect: true },
       { text: "Majú šupiny", isCorrect: false },
-      { text: "Majú krídla", isCorrect: true },
+      { text: "Nemajú krídla", isCorrect: false },
       { text: "Rozmnožovanie prebieha priamym vývinom", isCorrect: false }
     ],
     value: 2000,
@@ -240,5 +245,30 @@ export const questions: Question[] = [
       "Evolúcia stavovcov prebiehala prechodom z jednoduchších foriem na zložitejšie. Najprv sa objavili ryby vo vode, potom z nich vzišli obojživelníky, ktoré mohli žiť čiastočne vo vode a čiastočne na súši. Z obojživelníkov sa neskôr vyvinuli plazy, ktoré lepšie zvládli suché prostredie. Plazy následne dali vznik vtákom (napr. Archaeopteryx ukazuje prechod medzi plazmi a vtákmi) a cicavcom. Preto plazy pochádzajú z obojživelníkov. Tvrdenie, že vtáky pochádzajú od cicavcov, je nesprávne – pochádzajú od plazov. Obojživelníky nevznikli z plazov, ale naopak. Ryby nevznikli z vtákov, ale naopak, vtáky majú predchodcov vo forme dinosaurov. ",
     hostNotes:
       "A – vtáky nie sú potomkami cicavcov; B – obojživelníky sa vyvinuli z rýb, nie z plazov; D – ryby existovali dávno pred vtákmi. C – plazy sa vyvinuli z obojživelníkov – správne."
+  }
+];
+
+
+export const lifelines = [
+  {
+    id: "fifty",
+    name: "50:50",
+    description: "Removes two incorrect answers",
+    icon: "scissors",
+    used: false
+  },
+  {
+    id: "phone",
+    name: "Phone a Friend",
+    description: "Call a friend for help",
+    icon: "phone",
+    used: false
+  },
+  {
+    id: "audience",
+    name: "Ask the Audience",
+    description: "See what the audience thinks",
+    icon: "users",
+    used: false
   }
 ];
