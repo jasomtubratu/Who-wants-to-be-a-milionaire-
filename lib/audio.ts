@@ -15,26 +15,29 @@ class AudioManager {
       'correct.mp3',
       'incorrect.mp3',
       'finalanswer.mp3',
-      'question[1-5].mp3',
-      'question[5-10].mp3',
-      'question[10-15].mp3',
+      'question15.mp3',
+      'question510.mp3',
+      'question1015.mp3',
       'correct-millionare.mp3'
     ];
 
     audioFiles.forEach(file => {
-      const audio = new Audio(`/${file}`);
-      audio.preload = 'auto';
-      this.audioCache.set(file, audio);
+
+        const audio = typeof Audio !== "undefined" ? new Audio(`/${file}`) : null;
+        if (audio) {
+          audio.preload = 'auto';
+          this.audioCache.set(file, audio);
+        }
     });
   }
 
   private getQuestionAudio(questionIndex: number): string {
     if (questionIndex >= 0 && questionIndex <= 4) {
-      return 'question[1-5].mp3';
+      return 'question15.mp3';
     } else if (questionIndex >= 5 && questionIndex <= 9) {
-      return 'question[5-10].mp3';
+      return 'question510.mp3';
     } else {
-      return 'question[10-15].mp3';
+      return 'question1015.mp3';
     }
   }
 

@@ -46,7 +46,7 @@ export default function MoneyLadder({ currentQuestionIndex }: MoneyLadderProps) 
               )}
             >
               <span className="text-xs md:text-sm">{moneyLadder.length - idx}</span>
-              <span className="text-sm md:text-base">${amount.toLocaleString()}</span>
+              <span className="text-sm md:text-base">${amount.toLocaleString('en-US')}</span>
               {result && (
                 <span className="text-xs ml-2">
                   {result.correct ? "✓" : "✗"}
